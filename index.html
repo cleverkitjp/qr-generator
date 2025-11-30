@@ -38,7 +38,7 @@
     .card {
       width: 100%;
       max-width: 480px;
-      background: #fff;
+      background: var(--card-bg);
       border-radius: var(--radius-lg);
       padding: 22px 20px 26px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
@@ -53,6 +53,7 @@
       color: var(--text-muted);
       margin-bottom: 12px;
     }
+
     label {
       font-size: 0.85rem;
       font-weight: 600;
@@ -60,7 +61,7 @@
     .input-help {
       font-size: 0.75rem;
       color: var(--text-muted);
-      margin: 4px 0;
+      margin: 4px 0 6px;
     }
     textarea {
       width: 100%;
@@ -77,10 +78,88 @@
       outline: none;
       box-shadow: 0 0 0 2px rgba(0,122,255,0.15);
     }
+
+    .options-group {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.82rem;
+    }
+    .option-row span.label {
+      font-weight: 600;
+    }
+    .option-row select {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+      background: #fff;
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .color-row span.label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .color-swatches {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      padding: 0;
+      background-clip: padding-box;
+      cursor: pointer;
+    }
+    .color-swatch::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+    }
+    .color-swatch.active {
+      border-color: #000;
+    }
+    .color-swatch[data-color="#000000"]::after { background: #000000; }
+    .color-swatch[data-color="#333333"]::after { background: #333333; }
+    .color-swatch[data-color="#1b3a8a"]::after { background: #1b3a8a; }
+    .color-swatch[data-color="#006644"]::after { background: #006644; }
+    .color-swatch[data-color="#7a1e2c"]::after { background: #7a1e2c; }
+    .color-swatch[data-color="#4b2d73"]::after { background: #4b2d73; }
+
+    .color-labels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
     .controls {
       display: flex;
       gap: 8px;
-      margin: 10px 0 6px;
+      margin: 12px 0 6px;
     }
     .btn {
       border: none;
@@ -103,6 +182,7 @@
       background: transparent;
       color: var(--text-muted);
     }
+
     .qr-wrapper {
       margin-top: 14px;
       padding: 14px;
@@ -130,7 +210,9 @@
       color: var(--text-muted);
       text-align: center;
       line-height: 1.45;
+      padding: 0 8px;
     }
+
     .btn-download {
       border-radius: 999px;
       padding: 8px 14px;
@@ -164,6 +246,41 @@
   <p class="input-help">名刺URL・Wi-Fi情報・イベント案内など自由に入力できます。</p>
   <textarea id="qr-input" placeholder="例：https://example.com"></textarea>
 
+  <div class="options-group">
+    <div class="option-row">
+      <span class="label">サイズ</span>
+      <select id="size-select">
+        <option value="160">小（160px）</option>
+        <option value="220" selected>中（220px）</option>
+        <option value="280">大（280px）</option>
+      </select>
+    </div>
+    <div class="option-row">
+      <span class="label">誤り訂正レベル</span>
+      <select id="level-select">
+        <option value="L">L（データ優先）</option>
+        <option value="M" selected>M（標準）</option>
+        <option value="Q">Q（やや強い）</option>
+        <option value="H">H（読み取り優先）</option>
+      </select>
+    </div>
+    <div class="color-row">
+      <span class="label">色</span>
+      <div class="color-swatches" id="color-swatches">
+        <button type="button" class="color-swatch active" data-color="#000000" aria-label="黒"></button>
+        <button type="button" class="color-swatch" data-color="#333333" aria-label="ダークグレー"></button>
+        <button type="button" class="color-swatch" data-color="#1b3a8a" aria-label="ネイビー"></button>
+        <button type="button" class="color-swatch" data-color="#006644" aria-label="ダークグリーン"></button>
+        <button type="button" class="color-swatch" data-color="#7a1e2c" aria-label="バーガンディ"></button>
+        <button type="button" class="color-swatch" data-color="#4b2d73" aria-label="ディープパープル"></button>
+      </div>
+    </div>
+    <div class="color-labels">
+      <span>黒</span><span>ダークグレー</span><span>ネイビー</span>
+      <span>ダークグリーン</span><span>バーガンディ</span><span>ディープパープル</span>
+    </div>
+  </div>
+
   <div class="controls">
     <button id="generate-btn" class="btn btn-primary" type="button">QRコードを生成</button>
     <button id="clear-btn" class="btn btn-ghost" type="button">クリア</button>
@@ -181,7 +298,7 @@
 </main>
 </div>
 
-<!-- qrcode.js（integrityなし安定版） -->
+<!-- qrcode.js（integrityなし） -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <script>
@@ -194,7 +311,12 @@
   const placeholder = document.getElementById('qr-placeholder');
   const downloadBtn = document.getElementById('download-btn');
 
+  const sizeSelect = document.getElementById('size-select');
+  const levelSelect = document.getElementById('level-select');
+  const colorSwatches = document.querySelectorAll('.color-swatch');
+
   let qrInstance = null;
+  let currentColor = "#000000";
 
   function resetQR() {
     if (qrInstance) qrInstance.clear();
@@ -202,6 +324,7 @@
     qrTarget.appendChild(placeholder);
     downloadBtn.classList.remove("enabled");
     downloadBtn.href = "#";
+    downloadBtn.download = "";
   }
 
   function generateQR() {
@@ -213,30 +336,49 @@
     }
     errorEl.textContent = "";
 
+    const size = parseInt(sizeSelect.value, 10) || 220;
+    const levelKey = levelSelect.value || "M";
+    const correctLevel = QRCode.CorrectLevel[levelKey] || QRCode.CorrectLevel.M;
+
     qrTarget.innerHTML = "";
     qrInstance = new QRCode(qrTarget, {
       text: text,
-      width: 220,
-      height: 220,
-      correctLevel: QRCode.CorrectLevel.M
+      width: size,
+      height: size,
+      colorDark: currentColor,
+      colorLight: "#ffffff",
+      correctLevel: correctLevel
     });
 
     setTimeout(() => {
       const canvas = qrTarget.querySelector("canvas");
-      if (canvas) {
+      if (canvas && canvas.toDataURL) {
         const dataUrl = canvas.toDataURL("image/png");
         downloadBtn.href = dataUrl;
         downloadBtn.download = "qr.png";
         downloadBtn.classList.add("enabled");
+      } else {
+        downloadBtn.classList.remove("enabled");
+        downloadBtn.href = "#";
+        downloadBtn.download = "";
       }
-    }, 50);
+    }, 60);
   }
 
   generateBtn.addEventListener("click", generateQR);
 
   clearBtn.addEventListener("click", () => {
     input.value = "";
+    errorEl.textContent = "";
     resetQR();
+  });
+
+  colorSwatches.forEach(btn => {
+    btn.addEventListener("click", () => {
+      colorSwatches.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentColor = btn.getAttribute("data-color") || "#000000";
+    });
   });
 
   resetQR();
