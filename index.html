@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>QRコード作成ツール｜シンプル＆高速</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 簡易OGP（必要に応じて書き換え） -->
+  <meta property="og:title" content="QRコード作成ツール">
+  <meta property="og:description" content="URLやテキストから、ブラウザだけでQRコードを作成・保存できます。">
+  <meta name="description" content="完全無料・登録不要のシンプルなQRコード作成ツール。スマホに最適化されたUIで、URLやテキストからすぐにQRコードを生成し、PNG画像として保存できます。">
+
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --card-bg: #ffffff;
+      --primary: #007aff;
+      --primary-dark: #0060c7;
+      --text-main: #222222;
+      --text-muted: #666666;
+      --border: #dddddd;
+      --error: #d32f2f;
+      --radius-lg: 16px;
+      --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #fdfdfd 0, #f5f5f7 60%, #e9ebf1 100%);
+      color: var(--text-main);
+      padding: 16px;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 20px 18px 24px;
+    }
+
+    @media (min-width: 480px) {
+      .card {
+        padding: 24px 24px 28px;
+      }
+    }
+
+    .card-header {
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-top: 16px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .input-help {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      resize: vertical;
+      font-size: 0.9rem;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      outline: none;
+      font-family: inherit;
+      line-height: 1.4;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.15);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.06s ease, box-shadow 0.06s ease, background 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 3px 10px rgba(0, 122, 255, 0.35);
+      flex: 1;
+    }
+
+    .btn-primary:active {
+      background: var(--primary-dark);
+      transform: translateY(1px);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      padding-inline: 10px;
+    }
+
+    .btn-ghost:active {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .qr-wrapper {
+      margin-top: 4px;
+      padding: 16px 10px 8px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .qr-target {
+      width: 220px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) inset;
+      overflow: hidden;
+    }
+
+    .qr-placeholder {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 0 12px;
+      line-height: 1.5;
+    }
+
+    .qr-target canvas,
+    .qr-target img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .download-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 4px;
+      margin-top: 4px;
+    }
+
+    .btn-download {
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text-main);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+      opacity: 0.4;
+      transition: background 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .btn-download.enabled {
+      pointer-events: auto;
+      opacity: 1;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn-download:active {
+      background: #f2f2f2;
+    }
+
+    .btn-download span.icon {
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .error-message {
+      min-height: 1.2em;
+      font-size: 0.8rem;
+      color: var(--error);
+      margin-top: 4px;
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <main class="card" aria-label="QRコード作成ツール">
+    <header class="card-header">
+      <h1 class="title">QRコード作成ツール</h1>
+      <p class="subtitle">ブラウザだけで、URLやテキストからQRコードをすぐに作成できます。</p>
+    </header>
+
+    <section class="form-group">
+      <label for="qr-input">内容（URL・テキストなど）</label>
+      <p class="input-help">名刺のURL・Wi-Fiの接続ページ・イベント案内など、自由に入力できます。</p>
+      <textarea id="qr-input" placeholder="例：https://example.com&#10;または任意のテキスト"></textarea>
+      <div class="controls">
+        <button id="generate-btn" class="btn btn-primary" type="button">
+          QRコードを生成
+        </button>
+        <button id="clear-btn" class="btn btn-ghost" type="button">
+          クリア
+        </button>
+      </div>
+      <div id="error-message" class="error-message" aria-live="polite"></div>
+    </section>
+
+    <section aria-label="生成されたQRコード">
+      <div class="qr-wrapper">
+        <div id="qr-target" class="qr-target">
+          <div id="qr-placeholder" class="qr-placeholder">
+            入力した内容から<br>ここにQRコードが表示されます。
+          </div>
+        </div>
+        <div class="download-row">
+          <a id="download-btn" class="btn-download" href="#" download="">
+            <span class="icon">⬇</span>
+            <span>PNG画像として保存</span>
+          </a>
+        </div>
+      </div>
+      <p class="footer-note">
+        すべてブラウザ内で処理されます。入力内容はサーバーに送信されません。
+      </p>
+    </section>
+  </main>
+</div>
+
+<!-- qrcode.js本体（CDN）。ローカル設置したい場合は自前のqrcode.min.jsを読み込んでください。 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-Wu0IhZLQ0PBwBHQYaWV7k/akdUSHhDuDquynjUTyVKBf759cIUfZjt3Lz8BVLN+qZ41hUqZ0pXe3ZbP41AN4DQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+  (function () {
+    const input = document.getElementById('qr-input');
+    const generateBtn = document.getElementById('generate-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const errorEl = document.getElementById('error-message');
+    const qrTarget = document.getElementById('qr-target');
+    const qrPlaceholder = document.getElementById('qr-placeholder');
+    const downloadBtn = document.getElementById('download-btn');
+
+    let qrInstance = null;
+
+    function resetQR() {
+      if (qrInstance) {
+        qrInstance.clear();
+      }
+      qrTarget.innerHTML = '';
+      qrTarget.appendChild(qrPlaceholder);
+      disableDownload();
+    }
+
+    function enableDownload(dataUrl) {
+      downloadBtn.href = dataUrl;
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      downloadBtn.download = `qr-${y}${m}${d}-${hh}${mm}${ss}.png`;
+      downloadBtn.classList.add('enabled');
+    }
+
+    function disableDownload() {
+      downloadBtn.href = '#';
+      downloadBtn.download = '';
+      downloadBtn.classList.remove('enabled');
+    }
+
+    function showError(message) {
+      errorEl.textContent = message || '';
+    }
+
+    function generateQR(value, fromAuto = false) {
+      const text = (value != null ? value : input.value).trim();
+
+      if (!text) {
+        // 自動生成時はエラーにしない。手動ボタン時のみエラー表示。
+        if (!fromAuto) {
+          showError('QRコードにしたい内容を入力してください。');
+        } else {
+          showError('');
+        }
+        resetQR();
+        return;
+      }
+
+      showError('');
+
+      // 既存をクリアして再生成
+      qrTarget.innerHTML = '';
+      qrInstance = new QRCode(qrTarget, {
+        text: text,
+        width: 220,
+        height: 220,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      // DOM更新を待ってからdataURL取得
+      setTimeout(function () {
+        const canvas = qrTarget.querySelector('canvas');
+        const img = qrTarget.querySelector('img');
+        let dataUrl = null;
+
+        if (canvas && canvas.toDataURL) {
+          dataUrl = canvas.toDataURL('image/png');
+        } else if (img && img.src) {
+          dataUrl = img.src;
+        }
+
+        if (dataUrl) {
+          enableDownload(dataUrl);
+        } else {
+          disableDownload();
+        }
+      }, 50);
+    }
+
+    // ボタンイベント
+    generateBtn.addEventListener('click', function () {
+      generateQR(input.value, false);
+    });
+
+    clearBtn.addEventListener('click', function () {
+      input.value = '';
+      showError('');
+      resetQR();
+      input.focus();
+    });
+
+    // 入力リアルタイムで反映（軽負荷のため、簡易デバウンス）
+    let typingTimer = null;
+    input.addEventListener('input', function () {
+      if (typingTimer) {
+        clearTimeout(typingTimer);
+      }
+      typingTimer = setTimeout(function () {
+        generateQR(input.value, true);
+      }, 300); // 0.3秒無入力で反映
+    });
+
+    // 初期状態
+    resetQR();
+  })();
+</script>
+</body>
+</html>
